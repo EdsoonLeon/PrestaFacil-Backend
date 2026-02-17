@@ -1,0 +1,111 @@
+================================================
+    RESUMEN DEL PROYECTO PRESTAFACIL - BACKEND
+================================================
+
+## ¿QUÉ ES PRESTAFACIL?
+Sistema de gestión de préstamos desarrollado con .NET 9 y SQL Server.
+
+------------------------------------------------
+## ESTRUCTURA DE LA SOLUCIÓN
+------------------------------------------------
+
+La solución tiene 4 proyectos organizados por capas:
+
+1. PrestaFacil.Domain
+   - Contiene las ENTIDADES (clases que representan las tablas de la BD)
+   - Carpeta Entities con 6 clases:
+     * Cliente.cs     → Datos del cliente (nombre, DNI, teléfono, etc.)
+     * Prestamo.cs    → Datos del préstamo (monto, tasa, cuotas, etc.)
+     * Cuota.cs       → Cuotas generadas por cada préstamo
+     * Pago.cs        → Pagos realizados sobre las cuotas
+     * Usuario.cs     → Usuarios del sistema (admin, etc.)
+     * Configuracion.cs → Configuraciones generales del sistema
+
+2. PrestaFacil.Infrastructure
+   - Contiene la CONEXIÓN A LA BASE DE DATOS
+   - Carpeta Data:
+     * PrestaFacilContext.cs → DbContext que conecta las entidades con SQL Server
+   - Carpeta Migrations → Archivos generados por Entity Framework para crear las tablas
+
+3. PrestaFacil.Application
+   - Reservado para la LÓGICA DE NEGOCIO (cálculo de intereses, validaciones, etc.)
+   - Actualmente vacío, se usará en fases futuras
+
+4. PrestaFacil.API
+   - Contiene los CONTROLADORES (endpoints de la API REST)
+   - Carpeta Controllers con 6 controladores:
+     * ClientesController.cs       → CRUD de clientes
+     * PrestamosController.cs      → CRUD de préstamos
+     * CuotasController.cs         → CRUD de cuotas
+     * PagosController.cs          → CRUD de pagos
+     * UsuariosController.cs       → CRUD de usuarios
+     * ConfiguracionesController.cs → CRUD de configuraciones
+   - appsettings.json → Cadena de conexión a SQL Server
+   - Program.cs       → Configuración principal de la API
+
+------------------------------------------------
+## ARCHIVOS IMPORTANTES
+------------------------------------------------
+
+appsettings.json
+   → Contiene la cadena de conexión a SQL Server
+   → Server=DESKTOP-K9IK5DU\SQLEXPRESS;Database=PrestaFacil
+
+Program.cs
+   → Registra el DbContext con la cadena de conexión
+   → Configura Swagger para probar la API
+
+PrestaFacilContext.cs
+   → Define las tablas (DbSet) que maneja Entity Framework
+   → Configura relaciones entre tablas (llaves foráneas, tipos de datos)
+
+------------------------------------------------
+## PAQUETES NUGET INSTALADOS
+------------------------------------------------
+
+- Microsoft.EntityFrameworkCore.SqlServer 9.0.0 → Conexión con SQL Server
+- Microsoft.EntityFrameworkCore.Tools 9.0.0     → Comandos de migración
+- Microsoft.EntityFrameworkCore.Design 9.0.0    → Diseño de migraciones
+- Swashbuckle.AspNetCore 6.9.0                  → Swagger para probar la API
+
+------------------------------------------------
+## COMANDOS USADOS
+------------------------------------------------
+
+Add-Migration InitialCreate   → Crea el archivo de migración
+Update-Database               → Aplica la migración y crea las tablas en SQL Server
+
+------------------------------------------------
+## ENDPOINTS DISPONIBLES (API REST)
+------------------------------------------------
+
+Cada controlador tiene 5 operaciones:
+  GET    /api/Clientes        → Obtener todos
+  GET    /api/Clientes/{id}   → Obtener uno por ID
+  POST   /api/Clientes        → Crear nuevo
+  PUT    /api/Clientes/{id}   → Actualizar
+  DELETE /api/Clientes/{id}   → Eliminar
+
+Lo mismo aplica para: Prestamos, Cuotas, Pagos, Usuarios, Configuraciones
+
+------------------------------------------------
+## PROGRESO ACTUAL
+------------------------------------------------
+
+✅ Base de datos SQL Server creada
+✅ 6 Entidades creadas
+✅ Entity Framework configurado
+✅ Migraciones aplicadas
+✅ 6 Controladores funcionando
+✅ API probada en Swagger
+✅ Código subido a GitHub (PrestaFacil-Backend)
+
+SIGUIENTE PASO: Conectar el Frontend HTML con esta API
+
+------------------------------------------------
+## REPOSITORIO GITHUB
+------------------------------------------------
+
+https://github.com/EdsoonLeon/PrestaFacil-Backend
+
+================================================
