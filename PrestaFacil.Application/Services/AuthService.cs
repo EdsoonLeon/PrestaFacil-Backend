@@ -1,16 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PrestaFacil.Application.Interfaces;
 using PrestaFacil.Domain.Entities;
-
+using PrestaFacil.Infrastructure.Data;
 
 namespace PrestaFacil.Application.Services
 {
     public class AuthService : IAuthService
     {
         private readonly ITokenService _tokenService;
-        private readonly DbContext _context;
+        private readonly PrestaFacilContext _context;
 
-        public AuthService(ITokenService tokenService, DbContext context)
+        public AuthService(ITokenService tokenService, PrestaFacilContext context)
         {
             _tokenService = tokenService;
             _context = context;
@@ -18,7 +18,7 @@ namespace PrestaFacil.Application.Services
 
         public async Task<string?> LoginAsync(string email, string password)
         {
-            var usuario = await _context.Set<Usuario>()
+            var usuario = await _context.Usuarios
                 .FirstOrDefaultAsync(u => u.Email == email && u.Activo);
 
             if (usuario == null)
@@ -32,7 +32,7 @@ namespace PrestaFacil.Application.Services
 
         public async Task<Usuario> RegistrarAsync(Usuario usuario, string password)
         {
-            var existe = await _context.Set<Usuario>()
+            var existe = await _context.Usuarios
                 .AnyAsync(u => u.Email == usuario.Email);
 
             if (existe)
@@ -40,7 +40,7 @@ namespace PrestaFacil.Application.Services
 
             usuario.Password = BCrypt.Net.BCrypt.HashPassword(password);
 
-            _context.Set<Usuario>().Add(usuario);
+            _context.Usuarios.Add(usuario);
             await _context.SaveChangesAsync();
 
             return usuario;

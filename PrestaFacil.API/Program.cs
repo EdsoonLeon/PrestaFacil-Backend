@@ -22,6 +22,17 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IPrestamoService, PrestamoService>();
 
+// Configurar CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReact", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 // Configurar JWT
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -43,6 +54,7 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
+app.UseCors("AllowReact");
 app.UseMiddleware<PrestaFacil.API.Middleware.ExceptionMiddleware>();
 
 if (app.Environment.IsDevelopment())
@@ -51,7 +63,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection(); COMENTAMOS POR AHORA PORQUE ESTAMOS TRABAJANDO EN LOCAL
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
