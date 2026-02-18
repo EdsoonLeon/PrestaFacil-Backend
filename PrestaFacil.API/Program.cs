@@ -14,6 +14,8 @@ builder.Services.AddDbContext<PrestaFacilContext>(options =>
 
 var app = builder.Build();
 
+app.UseMiddleware<PrestaFacil.API.Middleware.ExceptionMiddleware>();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
