@@ -11,4 +11,8 @@
     <ProjectReference Include="..\PrestaFacil.Infrastructure\PrestaFacil.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Interfaces\" />
+  </ItemGroup>
+
 </Project>
