@@ -20,7 +20,9 @@ namespace PrestaFacil.API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Cliente>>> GetClientes()
         {
-            return await _context.Clientes.ToListAsync();
+            return await _context.Clientes
+                .Where(c => c.Activo == true)
+                .ToListAsync();
         }
 
         // GET: api/Clientes/5
@@ -36,9 +38,42 @@ namespace PrestaFacil.API.Controllers
         [HttpPost]
         public async Task<ActionResult<Cliente>> PostCliente(Cliente cliente)
         {
-            _context.Clientes.Add(cliente);
-            await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetCliente), new { id = cliente.ClienteId }, cliente);
+            try
+            {
+                // Primero verificar si existe con ese DNI (activo o inactivo)
+                var existente = await _context.Clientes
+                    .FirstOrDefaultAsync(c => c.DNI == cliente.DNI);
+
+                if (existente != null)
+                {
+                    if (existente.Activo == false)
+                    {
+                        // Reactivar y actualizar datos
+                        existente.Nombre = cliente.Nombre;
+                        existente.Apellido = cliente.Apellido;
+                        existente.Telefono = cliente.Telefono;
+                        existente.Email = cliente.Email;
+                        existente.Direccion = cliente.Direccion;
+                        existente.Activo = true;
+                        await _context.SaveChangesAsync();
+                        return Ok(existente);
+                    }
+                    else
+                    {
+                        // Ya existe activo con ese DNI
+                        return Conflict(new { message = "Ya existe un cliente activo con ese DNI." });
+                    }
+                }
+
+                // DNI nuevo, crear normalmente
+                _context.Clientes.Add(cliente);
+                await _context.SaveChangesAsync();
+                return CreatedAtAction(nameof(GetCliente), new { id = cliente.ClienteId }, cliente);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error interno del servidor." });
+            }
         }
 
         // PUT: api/Clientes/5
@@ -57,7 +92,8 @@ namespace PrestaFacil.API.Controllers
         {
             var cliente = await _context.Clientes.FindAsync(id);
             if (cliente == null) return NotFound();
-            _context.Clientes.Remove(cliente);
+
+            cliente.Activo = false;
             await _context.SaveChangesAsync();
             return NoContent();
         }
