@@ -43,7 +43,8 @@ namespace PrestaFacil.Infrastructure.Data
             modelBuilder.Entity<Cuota>(entity =>
             {
                 entity.HasKey(e => e.CuotaId);
-                entity.Property(e => e.MontoTotal).HasColumnType("decimal(18,2)");
+                entity.Property(e => e.MontoCuota).HasColumnType("decimal(18,2)");
+                entity.Property(e => e.MontoPagado).HasColumnType("decimal(18,2)");
                 entity.HasOne(e => e.Prestamo)
                       .WithMany(p => p.Cuotas)
                       .HasForeignKey(e => e.PrestamoId);
@@ -53,7 +54,7 @@ namespace PrestaFacil.Infrastructure.Data
             modelBuilder.Entity<Pago>(entity =>
             {
                 entity.HasKey(e => e.PagoId);
-                entity.Property(e => e.Monto).HasColumnType("decimal(18,2)");
+                entity.Property(e => e.MontoPagado).HasColumnType("decimal(18,2)");
                 entity.HasOne(e => e.Prestamo)
                       .WithMany(p => p.Pagos)
                       .HasForeignKey(e => e.PrestamoId);

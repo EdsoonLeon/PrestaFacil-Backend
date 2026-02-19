@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-
 namespace PrestaFacil.Domain.Entities
 {
     public class Cuota
@@ -20,42 +19,6 @@ namespace PrestaFacil.Domain.Entities
             }
         }
 
-        private decimal _montoCapital;
-        public decimal MontoCapital
-        {
-            get => _montoCapital;
-            set
-            {
-                if (value < 0)
-                    throw new ArgumentException("El monto capital no puede ser negativo.");
-                _montoCapital = value;
-            }
-        }
-
-        private decimal _montoInteres;
-        public decimal MontoInteres
-        {
-            get => _montoInteres;
-            set
-            {
-                if (value < 0)
-                    throw new ArgumentException("El monto interés no puede ser negativo.");
-                _montoInteres = value;
-            }
-        }
-
-        private decimal _montoTotal;
-        public decimal MontoTotal
-        {
-            get => _montoTotal;
-            set
-            {
-                if (value <= 0)
-                    throw new ArgumentException("El monto total debe ser mayor a cero.");
-                _montoTotal = value;
-            }
-        }
-
         private DateTime _fechaVencimiento;
         public DateTime FechaVencimiento
         {
@@ -65,6 +28,18 @@ namespace PrestaFacil.Domain.Entities
                 if (value == default)
                     throw new ArgumentException("La fecha de vencimiento no es válida.");
                 _fechaVencimiento = value;
+            }
+        }
+
+        private decimal _montoCuota;
+        public decimal MontoCuota
+        {
+            get => _montoCuota;
+            set
+            {
+                if (value <= 0)
+                    throw new ArgumentException("El monto de la cuota debe ser mayor a cero.");
+                _montoCuota = value;
             }
         }
 
@@ -80,6 +55,9 @@ namespace PrestaFacil.Domain.Entities
                 _estado = value;
             }
         }
+
+        public decimal MontoPagado { get; set; } = 0;
+        public DateTime? FechaPago { get; set; }
 
         public Prestamo Prestamo { get; set; } = null!;
         public ICollection<Pago> Pagos { get; set; } = new List<Pago>();

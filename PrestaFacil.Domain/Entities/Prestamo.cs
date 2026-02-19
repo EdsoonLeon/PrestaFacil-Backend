@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-
 namespace PrestaFacil.Domain.Entities
 {
     public class Prestamo
     {
         public int PrestamoId { get; set; }
         public int ClienteId { get; set; }
-
         private decimal _monto;
         public decimal Monto
         {
@@ -21,7 +19,6 @@ namespace PrestaFacil.Domain.Entities
                 _monto = value;
             }
         }
-
         private decimal _tasaInteres;
         public decimal TasaInteres
         {
@@ -35,7 +32,6 @@ namespace PrestaFacil.Domain.Entities
                 _tasaInteres = value;
             }
         }
-
         private int _numeroCuotas;
         public int NumeroCuotas
         {
@@ -49,6 +45,9 @@ namespace PrestaFacil.Domain.Entities
                 _numeroCuotas = value;
             }
         }
+        
+        public decimal CuotaMensual { get; set; }
+        public decimal SaldoPendiente { get; set; }
 
         private DateTime _fechaInicio;
         public DateTime FechaInicio
@@ -61,7 +60,6 @@ namespace PrestaFacil.Domain.Entities
                 _fechaInicio = value;
             }
         }
-
         private DateTime _fechaFin;
         public DateTime FechaFin
         {
@@ -75,7 +73,6 @@ namespace PrestaFacil.Domain.Entities
                 _fechaFin = value;
             }
         }
-
         private string _estado = "Activo";
         public string Estado
         {
@@ -88,9 +85,7 @@ namespace PrestaFacil.Domain.Entities
                 _estado = value;
             }
         }
-
         public DateTime FechaRegistro { get; set; } = DateTime.Now;
-
         public Cliente Cliente { get; set; } = null!;
         public ICollection<Cuota> Cuotas { get; set; } = new List<Cuota>();
         public ICollection<Pago> Pagos { get; set; } = new List<Pago>();

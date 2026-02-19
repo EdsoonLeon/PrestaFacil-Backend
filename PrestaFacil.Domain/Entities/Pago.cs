@@ -1,5 +1,4 @@
 ﻿using System;
-
 namespace PrestaFacil.Domain.Entities
 {
     public class Pago
@@ -8,15 +7,15 @@ namespace PrestaFacil.Domain.Entities
         public int PrestamoId { get; set; }
         public int CuotaId { get; set; }
 
-        private decimal _monto;
-        public decimal Monto
+        private decimal _montoPagado;
+        public decimal MontoPagado
         {
-            get => _monto;
+            get => _montoPagado;
             set
             {
                 if (value <= 0)
                     throw new ArgumentException("El monto del pago debe ser mayor a cero.");
-                _monto = value;
+                _montoPagado = value;
             }
         }
 
@@ -47,15 +46,17 @@ namespace PrestaFacil.Domain.Entities
             }
         }
 
-        private string _observacion = string.Empty;
-        public string Observacion
+        public int UsuarioId { get; set; }
+
+        private string _observaciones = string.Empty;
+        public string Observaciones
         {
-            get => _observacion;
+            get => _observaciones;
             set
             {
                 if (value != null && value.Length > 500)
-                    throw new ArgumentException("La observación no puede superar los 500 caracteres.");
-                _observacion = value?.Trim() ?? string.Empty;
+                    throw new ArgumentException("Las observaciones no pueden superar los 500 caracteres.");
+                _observaciones = value?.Trim() ?? string.Empty;
             }
         }
 
