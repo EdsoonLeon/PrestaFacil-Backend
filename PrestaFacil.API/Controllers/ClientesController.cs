@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using PrestaFacil.Domain.Entities;
 using PrestaFacil.Infrastructure.Data;
+using System.Security.Claims;
 
 namespace PrestaFacil.API.Controllers
 {
@@ -16,12 +17,19 @@ namespace PrestaFacil.API.Controllers
             _context = context;
         }
 
+        private int GetUsuarioId()
+        {
+            var claim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            return int.TryParse(claim, out int id) ? id : 0;
+        }
+
         // GET: api/Clientes
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Cliente>>> GetClientes()
         {
+            var usuarioId = GetUsuarioId();
             return await _context.Clientes
-                .Where(c => c.Activo == true)
+                .Where(c => c.Activo == true && c.UsuarioId == usuarioId)
                 .ToListAsync();
         }
 
@@ -29,7 +37,9 @@ namespace PrestaFacil.API.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Cliente>> GetCliente(int id)
         {
-            var cliente = await _context.Clientes.FindAsync(id);
+            var usuarioId = GetUsuarioId();
+            var cliente = await _context.Clientes
+                .FirstOrDefaultAsync(c => c.ClienteId == id && c.UsuarioId == usuarioId);
             if (cliente == null) return NotFound();
             return cliente;
         }
@@ -40,15 +50,17 @@ namespace PrestaFacil.API.Controllers
         {
             try
             {
-                // Primero verificar si existe con ese DNI (activo o inactivo)
+                var usuarioId = GetUsuarioId();
+                cliente.UsuarioId = usuarioId;
+
+                // Verificar si existe con ese DNI para este usuario
                 var existente = await _context.Clientes
-                    .FirstOrDefaultAsync(c => c.DNI == cliente.DNI);
+                    .FirstOrDefaultAsync(c => c.DNI == cliente.DNI && c.UsuarioId == usuarioId);
 
                 if (existente != null)
                 {
                     if (existente.Activo == false)
                     {
-                        // Reactivar y actualizar datos
                         existente.Nombre = cliente.Nombre;
                         existente.Apellido = cliente.Apellido;
                         existente.Telefono = cliente.Telefono;
@@ -60,19 +72,23 @@ namespace PrestaFacil.API.Controllers
                     }
                     else
                     {
-                        // Ya existe activo con ese DNI
                         return Conflict(new { message = "Ya existe un cliente activo con ese DNI." });
                     }
                 }
 
-                // DNI nuevo, crear normalmente
                 _context.Clientes.Add(cliente);
                 await _context.SaveChangesAsync();
                 return CreatedAtAction(nameof(GetCliente), new { id = cliente.ClienteId }, cliente);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Error interno del servidor." });
+                return StatusCode(500, new
+                {
+                    message = "Error interno del servidor.",
+                    error = ex.Message,
+                    inner = ex.InnerException?.Message,
+                    inner2 = ex.InnerException?.InnerException?.Message
+                });
             }
         }
 
@@ -80,8 +96,18 @@ namespace PrestaFacil.API.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutCliente(int id, Cliente cliente)
         {
-            if (id != cliente.ClienteId) return BadRequest();
-            _context.Entry(cliente).State = EntityState.Modified;
+            var usuarioId = GetUsuarioId();
+            var existente = await _context.Clientes
+                .FirstOrDefaultAsync(c => c.ClienteId == id && c.UsuarioId == usuarioId);
+            if (existente == null) return NotFound();
+
+            existente.Nombre = cliente.Nombre;
+            existente.Apellido = cliente.Apellido;
+            existente.DNI = cliente.DNI;
+            existente.Telefono = cliente.Telefono;
+            existente.Email = cliente.Email;
+            existente.Direccion = cliente.Direccion;
+
             await _context.SaveChangesAsync();
             return NoContent();
         }
@@ -90,9 +116,10 @@ namespace PrestaFacil.API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCliente(int id)
         {
-            var cliente = await _context.Clientes.FindAsync(id);
+            var usuarioId = GetUsuarioId();
+            var cliente = await _context.Clientes
+                .FirstOrDefaultAsync(c => c.ClienteId == id && c.UsuarioId == usuarioId);
             if (cliente == null) return NotFound();
-
             cliente.Activo = false;
             await _context.SaveChangesAsync();
             return NoContent();

@@ -26,15 +26,25 @@ namespace PrestaFacil.API.Controllers
         [HttpPost("registro")]
         public async Task<IActionResult> Registro([FromBody] RegistroRequest request)
         {
-            var usuario = new Usuario
+            try
             {
-                Nombre = request.Nombre,
-                Email = request.Email,
-                Rol = request.Rol ?? "Usuario"
-            };
-
-            var resultado = await _authService.RegistrarAsync(usuario, request.Password);
-            return Ok(ApiResponse<object>.Success(new { resultado.UsuarioId, resultado.Email }));
+                var usuario = new Usuario
+                {
+                    Nombre = request.Nombre,
+                    Email = request.Email,
+                    Rol = request.Rol ?? "Admin"
+                };
+                var resultado = await _authService.RegistrarAsync(usuario, request.Password);
+                return Ok(ApiResponse<object>.Success(new { resultado.UsuarioId, resultado.Email }));
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = ex.Message });
+            }
         }
     }
 
